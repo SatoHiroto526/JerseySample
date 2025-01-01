@@ -23,27 +23,26 @@ public class AuthenticationFilter implements ContainerRequestFilter {
 	@Override
 	public void filter(ContainerRequestContext requestContext) throws IOException {
 		
-		// Authorizationヘッダーから認証情報を取得 
-		String authHeader = requestContext.getHeaderString("Authorization");
-		
-		//認証情報のnullチェック
-		if(authHeader == null) {
-			//nullの場合はUnAuthorizedExceptionをthrow
-			throw new UnAuthorizedException(); 
-		}
-		
-		// ベーシック認証情報をデコード 
-		String encodedCredentials = authHeader.substring("Basic ".length()).trim(); 
-		String credentials = new String(Base64.getDecoder().decode(encodedCredentials)); 
-		
-		// ユーザー名とパスワードを解析 
-		StringTokenizer tokenizer = new StringTokenizer(credentials, ":"); 
-		String getUsername = tokenizer.nextToken(); 
-		String getPassword = tokenizer.nextToken();
-		
-		//認証処理
-		if(!(username.equals(getUsername) && password.equals(getPassword))) {
-			//認証失敗 の場合はUnAuthorizedExceptionをthrow
+		try {
+			// Authorizationヘッダーから認証情報を取得 
+			String authHeader = requestContext.getHeaderString("Authorization");
+			
+			// ベーシック認証情報をデコード 
+			String encodedCredentials = authHeader.substring("Basic ".length()).trim(); 
+			String credentials = new String(Base64.getDecoder().decode(encodedCredentials)); 
+			
+			// ユーザー名とパスワードを解析 
+			StringTokenizer tokenizer = new StringTokenizer(credentials, ":"); 
+			String getUsername = tokenizer.nextToken(); 
+			String getPassword = tokenizer.nextToken();
+			
+			//認証処理
+			if(!(username.equals(getUsername) && password.equals(getPassword))) {
+				//認証失敗 の場合はUnAuthorizedExceptionをthrow
+				throw new UnAuthorizedException(); 
+			}
+			
+		}catch(Exception e){
 			throw new UnAuthorizedException(); 
 		}
 		
